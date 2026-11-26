@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Family Password Manager Cost per Member: first year vs renewal</title>
+<meta name="description" content="Work out what a family or shared password manager plan really costs per member over 1 to 5 years, first-year promo and renewal included. Runs in your browser.">
+<style>
+:root{--bg:#141210;--fg:#ece6da;--acc:#d9893b;--mut:#948b7e;--line:#3a332b}
+body{margin:0;background:radial-gradient(circle at 80% 0,#2a2118,var(--bg) 60%);color:var(--fg);font:17px/1.55 Georgia,"Iowan Old Style",serif}
+main{max-width:740px;margin:0 auto;padding:40px 20px}
+h1{font:700 2rem/1.15 "Courier New",monospace;color:var(--acc);margin:0 0 8px}
+h2{font:700 1.1rem "Courier New",monospace;margin-top:2em}
+label{display:block;margin:12px 0 4px;font:14px "Courier New",monospace;color:var(--mut)}
+input,select{width:100%;box-sizing:border-box;padding:9px;background:#0d0b09;color:var(--fg);border:1px solid var(--line);font:16px "Courier New",monospace}
+table{width:100%;border-collapse:collapse;margin-top:16px;font:15px "Courier New",monospace}
+td,th{border-bottom:1px solid var(--line);padding:7px 4px;text-align:right}td:first-child,th:first-child{text-align:left}
+.big{font:700 1.6rem "Courier New",monospace;color:var(--acc)}
+small,.mut{color:var(--mut)}a{color:var(--acc)}
+</style>
+</head>
+<body><main>
+<h1>Family Password Manager Cost per Member</h1>
+<p class="mut">A family plan is sold on its first-year price. What you actually pay depends on the renewal rate and on how many seats you really fill. Enter a plan (or pick a preset), the number of people who will use it and how long you expect to keep it.</p>
+
+<label for="preset">Preset (prices read on proton.me/pass/pricing on 26 November 2026, USD, yearly billing)</label>
+<select id="preset">
+<option value="33.48|59.88|6">Proton Pass Family: $33.48 first year, then $59.88/yr, 6 accounts</option>
+<option value="23.88|35.88|1">Proton Pass Plus: $23.88 first year, then $35.88/yr, 1 account</option>
+<option value="77.88|119.88|1">Proton Unlimited: $77.88 first year, then $119.88/yr, 1 account</option>
+<option value="custom">Other plan: enter its prices below</option>
+</select>
+<label for="first">First-year price</label><input id="first" type="number" step="0.01" min="0" value="33.48">
+<label for="renew">Renewal price per year</label><input id="renew" type="number" step="0.01" min="0" value="59.88">
+<label for="seats">Seats included in one plan</label><input id="seats" type="number" min="1" value="6">
+<label for="users">People who will actually use it</label><input id="users" type="number" min="1" value="4">
+
+<p>Real cost per person per month over 3 years: <span class="big" id="out">-</span></p>
+<table><thead><tr><th>Years kept</th><th>Plans needed</th><th>Total paid</th><th>Per person / year</th><th>Per person / month</th></tr></thead><tbody id="rows"></tbody></table>
+<p><small>Assumes yearly billing, auto-renewal at the renewal price and no price change. Taxes and currency conversion are not included. Promotional prices change: check the provider's checkout before paying.</small></p>
+
+<h2>Why the per-member figure matters</h2>
+<p>A 6-seat plan shared by 3 people costs twice as much per person as the same plan used by 6. And from year two the renewal price applies, which for the Proton Pass Family preset is 79 % higher than the first year. For a side-by-side of Bitwarden Families, 1Password Families, Proton Pass Family, NordPass and Dashlane, with shared vaults and emergency access, see <a href="https://www.pwdfortress.com/en/blog/family-password-manager">PwdFortress: best family password manager plans compared</a>.</p>
+<p class="mut"><small>Source code: this page is a single HTML file, MIT licence. Nothing you type leaves your browser.</small></p>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+function calc(){
+ const f=+$('first').value||0,r=+$('renew').value||0,s=Math.max(1,+$('seats').value||1),u=Math.max(1,+$('users').value||1);
+ const plans=Math.ceil(u/s);let h='';
+ for(let y=1;y<=5;y++){const tot=plans*(f+r*(y-1));const py=tot/u/y;
+  h+=`<tr><td>${y}</td><td>${plans}</td><td>${tot.toFixed(2)}</td><td>${py.toFixed(2)}</td><td>${(py/12).toFixed(2)}</td></tr>`;
+  if(y===3)$('out').textContent=(py/12).toFixed(2);}
+ $('rows').innerHTML=h;}
+$('preset').addEventListener('change',e=>{if(e.target.value!=='custom'){const[a,b,c]=e.target.value.split('|');$('first').value=a;$('renew').value=b;$('seats').value=c;}calc();});
+['first','renew','seats','users'].forEach(i=>$(i).addEventListener('input',calc));calc();
+</script>
+</body></html>
